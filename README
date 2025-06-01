@@ -1,0 +1,121 @@
+# Test Automation Engineer 技術課題 – Booking Premium Plan E2E テスト
+
+このリポジトリは、**2025\_internship\_Test Automation Engineer 技術課題**（課題1）を解答するために作成した E2E テストスイートです。WebdriverIO (v8) と Mocha フレームワークを用いて、**プレミアム会員が「テーマパーク優待プラン」を予約し、完了ポップアップが表示されること**を自動検証します。
+
+---
+
+## 1. システム構成
+
+```text
+├── README.md             # 本ファイル
+├── bookingPremiumPlan.spec.js  # 課題1 のテストシナリオ
+├── wdio.conf.js          # WebdriverIO 設定ファイル（テンプレート同梱）
+├── package.json          # 依存関係および npm スクリプト
+└── .github/workflows/
+    └── ci.yml            # GitHub Actions 例（オプション）
+```
+
+---
+
+## 2. 前提条件
+
+| 要件         | バージョン / 備考                               |
+| ---------- | ---------------------------------------- |
+| Node.js    | **18.x 以上**<br>（LTS 推奨）                  |
+| npm / pnpm | npm 9+ または pnpm 8+                       |
+| OS         | Windows / macOS / Linux いずれも可            |
+| ブラウザ       | Google Chrome・Microsoft Edge（Chromium 系） |
+| WebDriver  | `@wdio/selenium-standalone` により自動 DL・管理  |
+
+> **ヒント**: 社内環境でプロキシが必要な場合は、`HTTPS_PROXY` 等の環境変数を設定してください。
+
+---
+
+## 3. セットアップ手順
+
+1. **リポジトリをクローン**
+
+   ```bash
+   git clone <REPOSITORY_URL>
+   cd <REPOSITORY_DIR>
+   ```
+2. **依存関係をインストール**
+
+   ```bash
+   npm ci            # もしくは pnpm install --frozen-lockfile
+   ```
+3. **テストサイトにアクセス可能か確認**（社内 FW 等でブロックされる場合は例外登録）
+
+   * URL: `https://hotel.testplanisphere.dev/ja/`
+
+---
+
+## 4. テスト実行方法
+
+### 4.1 単発実行
+
+```bash
+npx wdio run wdio.conf.js
+```
+
+### 4.2 主要 npm スクリプト
+
+| コマンド                  | 説明                               |
+| --------------------- | -------------------------------- |
+| `npm test`            | `wdio.conf.js` を読み込みテストを 1 度だけ実行 |
+| `npm run test:headed` | ブラウザ UI 表示（デバッグ用）                |
+| `npm run lint`        | ESLint でソースを静的解析                 |
+
+> **備考**: デフォルトでは Chrome (headless) が起動します。`WDIO_BROWSER=edge` などの環境変数で変更可能です。
+
+---
+
+## 5. テストデータ・環境変数
+
+| 変数名             | 既定値                                     | 用途 / 備考        |
+| --------------- | --------------------------------------- | -------------- |
+| `BASE_URL`      | `https://hotel.testplanisphere.dev/ja/` | テスト対象 URL      |
+| `TEST_EMAIL`    | `ichiro@example.com`                    | プレミアム会員メールアドレス |
+| `TEST_PASSWORD` | `password`                              | ログイン用パスワード     |
+
+テストデータは `bookingPremiumPlan.spec.js` 内の `TEST_DATA` オブジェクトで一元管理しています。CI 利用時などに環境によって差し替えたい場合は、`process.env` を参照するよう変更してください。
+
+---
+
+## 6. 品質保証のポイント
+
+* **ヘルパーメソッド & Page Object 分割** : サンプルでは簡潔さを優先して 1 ファイル構成ですが、実案件では Page Object パターンに分離して保守性を高めることを推奨します。
+* **テスト独立性** : 本シナリオはユーザーデータの状態に依存しないため、並列実行やリトライとも相性良好です。
+* **待機戦略** : 明示的な `expect` + WebdriverIO のスマートウェイトを利用し、不要な `browser.pause` を最小化しています。
+* **CI/CD 連携例** : `.github/workflows/ci.yml` に GitHub Actions のサンプルを同梱。Pull Request ごとに自動実行が可能です。
+
+---
+
+## 7. よくある質問 (FAQ)
+
+| 質問                                 | 回答                                                                                  |
+| ---------------------------------- | ----------------------------------------------------------------------------------- |
+| **Q.** CLI 実行時にブラウザが起動しません         | Node.js が古い可能性があります。`node -v` で 18 以上であることを確認してください。                                |
+| **Q.** `chromedriver` のバージョン不整合エラー | 既存のドライバーキャッシュを削除 (`~/.wdio`) し、再実行してください。                                           |
+| **Q.** 社内プロキシでダウンロードが失敗する          | `npm config set proxy` / `npm config set https-proxy` でプロキシ設定後、`npm ci` を再実行してください。 |
+
+---
+
+## 8. ライセンス
+
+本プロジェクトは **MIT License** で公開しています。詳細は `LICENSE` ファイルを参照してください。
+
+---
+
+## 9. コントリビューション
+
+1. Issue を立てて議論
+2. Feature Branch を切る
+3. ESLint & 単体テストがパスすることを確認
+4. Pull Request
+
+バグ報告・質問はお気軽にどうぞ！
+
+---
+
+Happy Testing 🧪🚀
